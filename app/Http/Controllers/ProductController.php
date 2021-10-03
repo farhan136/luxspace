@@ -63,7 +63,7 @@ class ProductController extends Controller
 
     public function show($id)
     {
-
+        return view('pages.dashboard.product.detail');
     }
 
     public function edit($id)
