@@ -23,7 +23,14 @@ Route::get('/', 'App\Http\Controllers\FrontendController@index')->name('index');
 
 Route::get('/details/{slug}', 'App\Http\Controllers\FrontendController@details')->name('details');
 
-Route::get('/cart', 'App\Http\Controllers\FrontendController@cart')->name('cart');
+
+Route::middleware(['auth:sanctum', 'verified'])->group(function(){
+	Route::get('/checkout/success', 'App\Http\Controllers\FrontendController@success')->name('checkout-success');
+	Route::post('/cart/{id}', 'App\Http\Controllers\FrontendController@cartAdd')->name('cart-add');
+	Route::delete('/cart/{id}', 'App\Http\Controllers\FrontendController@cartDelete')->name('cart-delete');
+	Route::post('/checkout', 'App\Http\Controllers\FrontendController@checkout')->name('checkout');
+	Route::get('/cart', 'App\Http\Controllers\FrontendController@cart')->name('cart');
+});
 
 Route::post('success', 'App\Http\Controllers\FrontendController@success')->name('success');
 

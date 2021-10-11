@@ -10,7 +10,7 @@ use App\Models\User;
 
 class Cart extends Model
 {
-	use HasFactory, SoftDeletes;
+	use HasFactory;
 
 	protected $fillable = [
         'product_id',
@@ -19,7 +19,7 @@ class Cart extends Model
 
     public function product()
     {
-        return $this->hasOne(Product::class);
+        return $this->belongsTo(Product::class);
     }
 
     public function user()
