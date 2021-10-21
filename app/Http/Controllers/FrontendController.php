@@ -2,15 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Http\Request;
-use App\Models\Product;
-use App\Models\Cart;
-use App\Models\Transaction;
-use App\Models\Transaction_item;
-use Midtrans\Config;
-use Midtrans\Snap;
 use Exception;
+use Midtrans\Snap;
+use App\Models\Cart;
+use Midtrans\Config;
+use App\Models\Product;
+use App\Models\Transaction;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Transaction_item;
 
 class FrontendController extends Controller
 {
@@ -70,9 +70,9 @@ class FrontendController extends Controller
         //create transaction item
         foreach ($carts as $cart) {
             $items[] = Transaction_item::create([
-                'transaction_id'=>$transaction_id,
+                'transaction_id'=>$transaction->id,
                 'user_id'=>$cart->user_id,
-                'product_id'=>$cart->product_id
+                'product_id'=>$cart->product_id 
             ]);
         }
 
@@ -80,15 +80,15 @@ class FrontendController extends Controller
         Cart::where('user_id', Auth::user()->id)->delete();
 
         //konfigurasi midtrans
-        Config::$serverday = config('services.midtrans.serverkey');
-        Config::$isProduction = config('services.midtrans.isProduction');
-        Config::$isSanitized = config('services.midtrans.isSanitized');
-        Config::$is3ds = config('services.midtrans.is3ds');
-
+        \Midtrans\Config::$serverKey = "SB-Mid-server-2dxzfgFWvrniqU1v_q4-tRu6";
+        \Midtrans\Config::$isProduction = false;
+        \Midtrans\Config::$isSanitized = true;
+        \Midtrans\Config::$is3ds = true;
+        
         //setup variable midtrans
         $midtrans = [
             'transaction_details'=> [
-                'order_id'=>'LUX-'.$transaction_id,
+                'order_id'=>'LUX-'.$transaction->id,
                 'gross_amount' => (int) $transaction->total_price
             ],
             'customer_details' => [
@@ -102,10 +102,12 @@ class FrontendController extends Controller
         //payment process
         try {
                 // Get Snap Payment Page URL
-                $paymentUrl = \Midtrans\Snap::createTransaction($params)->redirect_url;
+                $paymentUrl = Snap::createTransaction($midtrans)->redirect_url;
+
                 $transaction->payment_url = $paymentUrl;
                 $transaction->save();
-                // Redirect to Snap Payment Page
+                
+                // Redirect ke halaman midtrans
                 return redirect($paymentUrl);
                 }
                 catch (Exception $e) {

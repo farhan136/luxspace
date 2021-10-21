@@ -36,6 +36,9 @@ Route::post('success', 'App\Http\Controllers\FrontendController@success')->name(
 
 Route::middleware(['auth:sanctum', 'verified'])->name('dashboard.')->prefix('dashboard')->group(function(){
 	Route::get('/', 'App\Http\Controllers\DashboardController@index')->name('index');
+	Route::resource('mytransaction', 'App\Http\Controllers\MyTransactionController')->only([
+			'index', 'show'
+		]);
 
 	Route::middleware(['apakahadmin'])->group(function(){
 		Route::resource('product', 'App\Http\Controllers\ProductController');
